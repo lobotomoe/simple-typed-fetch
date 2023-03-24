@@ -4,7 +4,7 @@
     "type": "git",
     "url": "https://github.com/lobotomoe/simple-typed-fetch.git"
   },
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Making HTTP requests human way",
   "main": "dist/index.js",
   "scripts": {
@@ -12,7 +12,13 @@
     "build": "rimraf dist/ && tsc",
     "clean": "rimraf dist/"
   },
-  "keywords": [],
+  "keywords": [
+    "fetch",
+    "node-fetch",
+    "unfetch",
+    "zod",
+    "typed"
+  ],
   "author": "Alex Kraiz",
   "license": "ISC",
   "dependencies": {

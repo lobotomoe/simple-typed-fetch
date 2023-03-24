@@ -1,10 +1,12 @@
 # Simple Typed Fetch
 
-This package provides utility functions for making HTTP requests with validation using the zod schema validation library. It handles various error cases, client and server errors, and offers an additional simpleFetch wrapper function for easier usage.
+This package provides utility functions for making HTTP requests with validation using the [zod](https://zod.dev) schema validation library. It handles various error cases, client and server errors, and offers an additional `simpleFetch` wrapper function for easier usage.
 
 To install the required dependencies for this package, run:
 
-`npm install simple-typed-fetch`
+```sh
+npm install simple-typed-fetch
+```
 
 ## Usage
 
