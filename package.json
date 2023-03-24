@@ -4,7 +4,7 @@
     "type": "git",
     "url": "https://github.com/lobotomoe/simple-typed-fetch.git"
   },
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Making HTTP requests human way",
   "main": "dist/index.js",
   "scripts": {
