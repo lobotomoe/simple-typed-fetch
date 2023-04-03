@@ -4,13 +4,25 @@
     "type": "git",
     "url": "https://github.com/lobotomoe/simple-typed-fetch.git"
   },
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Making HTTP requests human way",
-  "main": "dist/index.js",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "type": "module",
   "scripts": {
     "prepack": "npm run build",
-    "build": "rimraf dist/ && tsc",
-    "clean": "rimraf dist/"
+    "clean": "rimraf dist/",
+    "build": "rimraf dist/ && tsup src/index.ts --format cjs,esm --dts --clean",
+    "watch": "npm run build -- --watch src",
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "fetch",
@@ -31,6 +43,7 @@
     "dist/**/*"
   ],
   "devDependencies": {
-    "rimraf": "^4.4.1"
+    "rimraf": "^4.4.1",
+    "tsup": "^6.7.0"
   }
 }

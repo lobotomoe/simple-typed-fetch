@@ -1,5 +1,5 @@
 import type { Schema, z } from 'zod';
-import fetchWithValidation from './fetchWithValidation';
+import fetchWithValidation from './fetchWithValidation.js';
 
 // https://stackoverflow.com/a/64919133
 class Wrapper<DataOut, DataIn, ErrorOut, ErrorIn> {
