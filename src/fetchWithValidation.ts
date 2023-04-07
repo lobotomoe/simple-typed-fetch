@@ -23,32 +23,36 @@ export default async function fetchWithValidation<DataOut, DataIn, ErrorOut, Err
 	// clientErrorPayloadParseError
 	// clientError
 	// payloadParseError
-	// payload
+	// payload]
 
-	const fetchResult = await fromPromise(fetch(url, {
-		...options ?? {},
-		headers: {
-			...(options ? options.headers : {}),
-		},
-	}), e => {
-		if (e instanceof Error) {
+	const requestOptions = {
+		...options,
+		headers: options?.headers ?? {},
+	};
+
+	const fetchResult = await fromPromise(
+		fetch(url, requestOptions),
+		e => {
+			if (e instanceof Error) {
+				return err({
+					requestOptions,
+					response: undefined,
+					type: 'fetchError' as const,
+					url,
+					message: e.message,
+					error: e,
+				});
+			}
+
 			return err({
+				requestOptions,
 				response: undefined,
-				type: 'fetchError' as const,
+				type: 'unknownFetchThrow' as const,
 				url,
-				message: e.message,
+				message: 'Unknown fetch error',
 				error: e,
 			});
-		}
-
-		return err({
-			response: undefined,
-			type: 'unknownFetchThrow' as const,
-			url,
-			message: 'Unknown fetch error',
-			error: e,
 		});
-	});
 
 	if (fetchResult.isErr()) {
 		return fetchResult.error;
@@ -59,6 +63,7 @@ export default async function fetchWithValidation<DataOut, DataIn, ErrorOut, Err
 	const textResult = await fromPromise(response.text(), e => {
 		if (e instanceof Error) {
 			return err({
+				requestOptions,
 				response,
 				type: 'unknownGetTextError' as const,
 				url,
@@ -68,6 +73,7 @@ export default async function fetchWithValidation<DataOut, DataIn, ErrorOut, Err
 		}
 
 		return err({
+			requestOptions,
 			response,
 			type: 'unknownGetTextUnknownError' as const,
 			url,
@@ -84,11 +90,12 @@ export default async function fetchWithValidation<DataOut, DataIn, ErrorOut, Err
 
 	if (response.status >= 500) { // Server error
 		return err({
+			requestOptions,
 			response,
 			type: 'serverError' as const,
 			url,
 			message: `Server error: ${response.status} ${response.statusText}`,
-			status: response.status,
+			// status: response.status,
 			text,
 		});
 	}
@@ -98,6 +105,7 @@ export default async function fetchWithValidation<DataOut, DataIn, ErrorOut, Err
 		e => {
 			if (e instanceof Error) {
 				return err({
+					requestOptions,
 					response,
 					type: 'jsonParseError' as const,
 					url,
@@ -107,6 +115,7 @@ export default async function fetchWithValidation<DataOut, DataIn, ErrorOut, Err
 			}
 
 			return err({
+				requestOptions,
 				response,
 				type: 'jsonParseUnknownError' as const,
 				url,
@@ -135,32 +144,35 @@ export default async function fetchWithValidation<DataOut, DataIn, ErrorOut, Err
 			const serverError = errorSchema.safeParse(json);
 			if (serverError.success) {
 				return err({
+					requestOptions,
 					response,
 					type: 'clientErrorWithResponsePayload' as const,
 					url,
 					message: `Client error: ${response.status} ${response.statusText}. Server error: ${JSON.stringify(serverError.data)}`,
-					status: response.status,
+					// status: response.status,
 					payload: serverError.data,
 				});
 			}
 
 			return err({
+				requestOptions,
 				response,
 				type: 'clientErrorPayloadParseError' as const,
 				url,
 				message: 'Can\'t recognize error message. Response: ' + text,
-				status: response.status,
+				// status: response.status,
 				text,
 				error: serverError.error,
 			});
 		}
 
 		return err({
+			requestOptions,
 			response,
 			type: 'clientError' as const,
 			url,
 			message: `Error: ${response.status} ${response.statusText}. Response: ${text}`,
-			status: response.status,
+			// status: response.status,
 			text,
 		});
 	}
@@ -169,6 +181,7 @@ export default async function fetchWithValidation<DataOut, DataIn, ErrorOut, Err
 	if (!payload.success) {
 		const issuesMessages = payload.error.issues.map(issue => `[${issue.path.join('.')}]  ${issue.message}`).join(', ');
 		return err({
+			requestOptions,
 			response,
 			type: 'payloadParseError' as const,
 			url,
