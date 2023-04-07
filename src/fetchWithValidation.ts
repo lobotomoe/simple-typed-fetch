@@ -28,12 +28,12 @@ export default async function fetchWithValidation<DataOut, DataIn, ErrorOut, Err
 	const fetchResult = await fromPromise(fetch(url, {
 		...options ?? {},
 		headers: {
-			'Cache-Control': 'no-store, max-age=0',
 			...(options ? options.headers : {}),
 		},
 	}), e => {
 		if (e instanceof Error) {
 			return err({
+				response: undefined,
 				type: 'fetchError' as const,
 				url,
 				message: e.message,
@@ -42,6 +42,7 @@ export default async function fetchWithValidation<DataOut, DataIn, ErrorOut, Err
 		}
 
 		return err({
+			response: undefined,
 			type: 'unknownFetchThrow' as const,
 			url,
 			message: 'Unknown fetch error',
@@ -58,6 +59,7 @@ export default async function fetchWithValidation<DataOut, DataIn, ErrorOut, Err
 	const textResult = await fromPromise(response.text(), e => {
 		if (e instanceof Error) {
 			return err({
+				response,
 				type: 'unknownGetTextError' as const,
 				url,
 				message: `Can't get response content: ${e.message}`,
@@ -66,6 +68,7 @@ export default async function fetchWithValidation<DataOut, DataIn, ErrorOut, Err
 		}
 
 		return err({
+			response,
 			type: 'unknownGetTextUnknownError' as const,
 			url,
 			message: 'Can\'t get response content: unknown error',
@@ -81,6 +84,7 @@ export default async function fetchWithValidation<DataOut, DataIn, ErrorOut, Err
 
 	if (response.status >= 500) { // Server error
 		return err({
+			response,
 			type: 'serverError' as const,
 			url,
 			message: `Server error: ${response.status} ${response.statusText}`,
@@ -94,6 +98,7 @@ export default async function fetchWithValidation<DataOut, DataIn, ErrorOut, Err
 		e => {
 			if (e instanceof Error) {
 				return err({
+					response,
 					type: 'jsonParseError' as const,
 					url,
 					message: e.message,
@@ -102,6 +107,7 @@ export default async function fetchWithValidation<DataOut, DataIn, ErrorOut, Err
 			}
 
 			return err({
+				response,
 				type: 'jsonParseUnknownError' as const,
 				url,
 				message: 'Unknown JSON parse error',
@@ -129,6 +135,7 @@ export default async function fetchWithValidation<DataOut, DataIn, ErrorOut, Err
 			const serverError = errorSchema.safeParse(json);
 			if (serverError.success) {
 				return err({
+					response,
 					type: 'clientErrorWithResponsePayload' as const,
 					url,
 					message: `Client error: ${response.status} ${response.statusText}. Server error: ${JSON.stringify(serverError.data)}`,
@@ -138,6 +145,7 @@ export default async function fetchWithValidation<DataOut, DataIn, ErrorOut, Err
 			}
 
 			return err({
+				response,
 				type: 'clientErrorPayloadParseError' as const,
 				url,
 				message: 'Can\'t recognize error message. Response: ' + text,
@@ -148,6 +156,7 @@ export default async function fetchWithValidation<DataOut, DataIn, ErrorOut, Err
 		}
 
 		return err({
+			response,
 			type: 'clientError' as const,
 			url,
 			message: `Error: ${response.status} ${response.statusText}. Response: ${text}`,
@@ -160,6 +169,7 @@ export default async function fetchWithValidation<DataOut, DataIn, ErrorOut, Err
 	if (!payload.success) {
 		const issuesMessages = payload.error.issues.map(issue => `[${issue.path.join('.')}]  ${issue.message}`).join(', ');
 		return err({
+			response,
 			type: 'payloadParseError' as const,
 			url,
 			message: `Can't recognize response payload: ${issuesMessages}`,
