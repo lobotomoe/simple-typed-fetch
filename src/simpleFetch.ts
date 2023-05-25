@@ -26,6 +26,6 @@ export default function simpleFetch<O, I, EO, EI, P extends unknown[]>(
 			throw new Error(`${message} (${url})`);
 		}
 
-		return result.value;
+		return result.value.data;
 	};
 }
