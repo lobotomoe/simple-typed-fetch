@@ -130,10 +130,7 @@ export default async function fetchWithValidation<DataOut, DataIn, ErrorOut, Err
 		// Try to parse as text
 		const textPayload = schema.safeParse(text);
 		if (textPayload.success) {
-			return ok({
-				response,
-				data: textPayload.data,
-			}); // Payload is text
+			return ok(textPayload.data); // Payload is text
 		}
 
 		jsonResult.error.error.message = `Can't parse response as JSON: ${jsonResult.error.error.message}. Original response: ${text}`;
@@ -193,8 +190,5 @@ export default async function fetchWithValidation<DataOut, DataIn, ErrorOut, Err
 		});
 	}
 
-	return ok({
-		response,
-		data: payload.data,
-	});
+	return ok(payload.data);
 }
