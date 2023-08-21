@@ -1,5 +1,4 @@
 import type {Schema, z} from 'zod';
-import fetch from 'isomorphic-unfetch';
 
 import {
 	err, fromPromise, fromThrowable, ok,
