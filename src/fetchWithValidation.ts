@@ -1,10 +1,13 @@
 import type {Schema, z} from 'zod';
 
-import {
-	err, fromPromise, fromThrowable, ok,
-} from 'neverthrow';
+import {err, fromPromise, fromThrowable, ok} from 'neverthrow';
 
-export default async function fetchWithValidation<DataOut, DataIn, ErrorOut, ErrorIn>(
+export default async function fetchWithValidation<
+	DataOut,
+	DataIn,
+	ErrorOut,
+	ErrorIn,
+>(
 	url: string,
 	schema: Schema<DataOut, z.ZodTypeDef, DataIn>,
 	options?: RequestInit,
@@ -29,29 +32,27 @@ export default async function fetchWithValidation<DataOut, DataIn, ErrorOut, Err
 		headers: options?.headers ?? {},
 	};
 
-	const fetchResult = await fromPromise(
-		fetch(url, requestOptions),
-		e => {
-			if (e instanceof Error) {
-				return err({
-					requestOptions,
-					response: undefined,
-					type: 'fetchError' as const,
-					url,
-					message: e.message,
-					error: e,
-				});
-			}
-
+	const fetchResult = await fromPromise(fetch(url, requestOptions), e => {
+		if (e instanceof Error) {
 			return err({
 				requestOptions,
 				response: undefined,
-				type: 'unknownFetchThrow' as const,
+				type: 'fetchError' as const,
 				url,
-				message: 'Unknown fetch error',
+				message: e.message,
 				error: e,
 			});
+		}
+
+		return err({
+			requestOptions,
+			response: undefined,
+			type: 'unknownFetchThrow' as const,
+			url,
+			message: 'Unknown fetch error',
+			error: e,
 		});
+	});
 
 	if (fetchResult.isErr()) {
 		return fetchResult.error;
@@ -87,7 +88,8 @@ export default async function fetchWithValidation<DataOut, DataIn, ErrorOut, Err
 
 	const text = textResult.value;
 
-	if (response.status >= 500) { // Server error
+	if (response.status >= 500) {
+		// Server error
 		return err({
 			requestOptions,
 			response,
@@ -99,29 +101,27 @@ export default async function fetchWithValidation<DataOut, DataIn, ErrorOut, Err
 		});
 	}
 
-	const safeParseJson = fromThrowable(
-		JSON.parse,
-		e => {
-			if (e instanceof Error) {
-				return err({
-					requestOptions,
-					response,
-					type: 'jsonParseError' as const,
-					url,
-					message: e.message,
-					error: e,
-				});
-			}
-
+	const safeParseJson = fromThrowable(JSON.parse, e => {
+		if (e instanceof Error) {
 			return err({
 				requestOptions,
 				response,
-				type: 'jsonParseUnknownError' as const,
+				type: 'jsonParseError' as const,
 				url,
-				message: 'Unknown JSON parse error',
+				message: e.message,
 				error: e,
 			});
+		}
+
+		return err({
+			requestOptions,
+			response,
+			type: 'jsonParseUnknownError' as const,
+			url,
+			message: 'Unknown JSON parse error',
+			error: e,
 		});
+	});
 
 	const jsonResult = safeParseJson(text);
 
@@ -141,7 +141,8 @@ export default async function fetchWithValidation<DataOut, DataIn, ErrorOut, Err
 
 	const json: unknown = jsonResult.value;
 
-	if (response.status >= 400) { // Client error
+	if (response.status >= 400) {
+		// Client error
 		if (errorSchema) {
 			const serverError = errorSchema.safeParse(json);
 			if (serverError.success) {
@@ -150,7 +151,9 @@ export default async function fetchWithValidation<DataOut, DataIn, ErrorOut, Err
 					response,
 					type: 'clientErrorWithResponsePayload' as const,
 					url,
-					message: `Client error: ${response.status} ${response.statusText}. Server error: ${JSON.stringify(serverError.data)}`,
+					message: `Client error: ${response.status} ${
+						response.statusText
+					}. Server error: ${JSON.stringify(serverError.data)}`,
 					// status: response.status,
 					payload: serverError.data,
 				});
@@ -181,7 +184,9 @@ export default async function fetchWithValidation<DataOut, DataIn, ErrorOut, Err
 
 	const payload = schema.safeParse(json);
 	if (!payload.success) {
-		const issuesMessages = payload.error.issues.map(issue => `[${issue.path.join('.')}]  ${issue.message}`).join(', ');
+		const issuesMessages = payload.error.issues
+			.map(issue => `[${issue.path.join('.')}]  ${issue.message}`)
+			.join(', ');
 		return err({
 			requestOptions,
 			response,
