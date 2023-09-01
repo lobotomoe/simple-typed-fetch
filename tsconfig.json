@@ -20,13 +20,8 @@
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "skipLibCheck": true,
-    "moduleResolution": "node"
+    "moduleResolution": "NodeNext"
   },
-  "include": [
-    "./src/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ],
+  "include": ["./src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }
