@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import type {Schema, z} from 'zod';
+import type { Schema, z } from 'zod';
 import fetchWithValidation from './fetchWithValidation.js';
 
 // https://stackoverflow.com/a/64919133
@@ -14,15 +14,15 @@ class Wrapper<DataOut, DataIn, ErrorOut, ErrorIn> {
 	}
 }
 
-type FetchWithValidationInternalType<O, I, EO, EI> = ReturnType<Wrapper<O, I, EO, EI>['wrapped']>;
+export type FetchWithValidationType<O, I, EO, EI> = ReturnType<Wrapper<O, I, EO, EI>['wrapped']>;
 
 export default function simpleFetch<O, I, EO, EI, P extends unknown[]>(
-	f: (...params: P) => FetchWithValidationInternalType<O, I, EO, EI>,
-) {
+	f: (...params: P) => FetchWithValidationType<O, I, EO, EI>,
+): (...params: Parameters<typeof f>) => Promise<O> {
 	return async (...params: Parameters<typeof f>) => {
 		const result = await f(...params);
 		if (result.isErr()) {
-			const {message, url} = result.error;
+			const { message, url } = result.error;
 			throw new Error(`${message} (${url})`);
 		}
 
