@@ -131,6 +131,7 @@ export default async function fetchWithValidation<
 		if (textPayload.success) {
 			return ok({
 				response,
+				text,
 				data: textPayload.data,
 			}); // Payload is text
 		}
@@ -151,6 +152,7 @@ export default async function fetchWithValidation<
 					response,
 					type: 'clientErrorWithResponsePayload' as const,
 					url,
+					text,
 					message: `Client error: ${response.status} ${
 						response.statusText
 					}. Server error: ${JSON.stringify(serverError.data)}`,
@@ -192,6 +194,7 @@ export default async function fetchWithValidation<
 			response,
 			type: 'payloadParseError' as const,
 			url,
+			text,
 			message: `Can't recognize response payload: ${issuesMessages}`,
 			error: payload.error,
 		});
@@ -199,6 +202,7 @@ export default async function fetchWithValidation<
 
 	return ok({
 		response,
+		text,
 		data: payload.data,
 	});
 }
