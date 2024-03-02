@@ -110,6 +110,7 @@ export default async function fetchWithValidation<
 				url,
 				message: e.message,
 				error: e,
+				text,
 			});
 		}
 
@@ -132,6 +133,7 @@ export default async function fetchWithValidation<
 			return ok({
 				response,
 				data: textPayload.data,
+				text,
 			}); // Payload is text
 		}
 
@@ -156,6 +158,7 @@ export default async function fetchWithValidation<
 					}. Server error: ${JSON.stringify(serverError.data)}`,
 					// status: response.status,
 					payload: serverError.data,
+					text,
 				});
 			}
 
@@ -200,5 +203,6 @@ export default async function fetchWithValidation<
 	return ok({
 		response,
 		data: payload.data,
+		text,
 	});
 }
