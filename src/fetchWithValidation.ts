@@ -36,7 +36,7 @@ export default async function fetchWithValidation<
 		if (e instanceof Error) {
 			return err({
 				requestOptions,
-				response: undefined,
+				// response: undefined,
 				type: 'fetchError' as const,
 				url,
 				message: e.message,
@@ -46,7 +46,7 @@ export default async function fetchWithValidation<
 
 		return err({
 			requestOptions,
-			response: undefined,
+			// response: undefined,
 			type: 'unknownFetchThrow' as const,
 			url,
 			message: 'Unknown fetch error',
