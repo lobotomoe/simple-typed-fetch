@@ -59,24 +59,25 @@ export default async function fetchWithValidation<
 	}
 
 	const response = fetchResult.value;
+	const sharedData = {
+		requestOptions,
+		response,
+		url,
+	} as const;
 
 	const textResult = await fromPromise(response.text(), e => {
 		if (e instanceof Error) {
 			return err({
-				requestOptions,
-				response,
+				...sharedData,
 				type: 'unknownGetTextError' as const,
-				url,
 				message: `Can't get response content: ${e.message}`,
 				error: e,
 			});
 		}
 
 		return err({
-			requestOptions,
-			response,
+			...sharedData,
 			type: 'unknownGetTextUnknownError' as const,
-			url,
 			message: 'Can\'t get response content: unknown error',
 			error: e,
 		});
@@ -87,38 +88,34 @@ export default async function fetchWithValidation<
 	}
 
 	const text = textResult.value;
+	const sharedDataWithText = {
+		...sharedData,
+		text,
+	} as const;
 
 	if (response.status >= 500) {
 		// Server error
 		return err({
-			requestOptions,
-			response,
+			...sharedDataWithText,
 			type: 'serverError' as const,
-			url,
 			message: `Server error: ${response.status} ${response.statusText}`,
 			// status: response.status,
-			text,
 		});
 	}
 
 	const safeParseJson = fromThrowable(JSON.parse, e => {
 		if (e instanceof Error) {
 			return err({
-				requestOptions,
-				response,
+				...sharedDataWithText,
 				type: 'jsonParseError' as const,
-				url,
 				message: e.message,
 				error: e,
-				text,
 			});
 		}
 
 		return err({
-			requestOptions,
-			response,
+			...sharedDataWithText,
 			type: 'jsonParseUnknownError' as const,
-			url,
 			message: 'Unknown JSON parse error',
 			error: e,
 		});
@@ -131,9 +128,9 @@ export default async function fetchWithValidation<
 		const textPayload = schema.safeParse(text);
 		if (textPayload.success) {
 			return ok({
+				...sharedDataWithText,
 				response,
 				data: textPayload.data,
-				text,
 			}); // Payload is text
 		}
 
@@ -149,39 +146,30 @@ export default async function fetchWithValidation<
 			const serverError = errorSchema.safeParse(json);
 			if (serverError.success) {
 				return err({
-					requestOptions,
-					response,
+					...sharedDataWithText,
 					type: 'clientErrorWithResponsePayload' as const,
-					url,
 					message: `Client error: ${response.status} ${
 						response.statusText
 					}. Server error: ${JSON.stringify(serverError.data)}`,
 					// status: response.status,
 					payload: serverError.data,
-					text,
 				});
 			}
 
 			return err({
-				requestOptions,
-				response,
+				...sharedDataWithText,
 				type: 'clientErrorPayloadParseError' as const,
-				url,
 				message: 'Can\'t recognize error message. Response: ' + text,
 				// status: response.status,
-				text,
 				error: serverError.error,
 			});
 		}
 
 		return err({
-			requestOptions,
-			response,
+			...sharedDataWithText,
 			type: 'clientError' as const,
-			url,
 			message: `Error: ${response.status} ${response.statusText}. Response: ${text}`,
 			// status: response.status,
-			text,
 		});
 	}
 
@@ -191,18 +179,15 @@ export default async function fetchWithValidation<
 			.map(issue => `[${issue.path.join('.')}]  ${issue.message}`)
 			.join(', ');
 		return err({
-			requestOptions,
-			response,
+			...sharedDataWithText,
 			type: 'payloadParseError' as const,
-			url,
 			message: `Can't recognize response payload: ${issuesMessages}`,
 			error: payload.error,
 		});
 	}
 
 	return ok({
-		response,
+		...sharedDataWithText,
 		data: payload.data,
-		text,
 	});
 }
