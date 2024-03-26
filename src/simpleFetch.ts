@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import type {Schema, z} from 'zod';
+import {type z} from 'zod';
+import type {Schema} from 'zod';
 import fetchWithValidation from './fetchWithValidation.js';
 
 // https://stackoverflow.com/a/64919133
@@ -29,3 +30,19 @@ export default function simpleFetch<O, I, EO, EI, P extends unknown[]>(
 		return result.value.data;
 	};
 }
+
+// async function test() {
+// 	await simpleFetch(
+// 		async () =>
+// 			fetchWithValidation(
+// 				'',
+// 				z.object({
+// 					messageId: z.number().int(),
+// 				}),
+// 				undefined,
+// 				z.object({
+// 					message: z.string(),
+// 				}),
+// 			),
+// 	)();
+// }
