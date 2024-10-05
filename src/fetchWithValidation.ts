@@ -156,7 +156,7 @@ export default async function fetchWithValidation<
     return err({
       type: "clientError" as const,
       ...sharedDataWithText,
-      message: `Error: ${response.status} ${response.statusText}. Response: ${text}`,
+      message: `Error: ${response.status} ${response.statusText}. Original response: ${text}`,
       errorMetadata,
     });
   }
@@ -170,7 +170,7 @@ export default async function fetchWithValidation<
     return err({
       type: "payloadParseError" as const,
       ...sharedDataWithText,
-      message: `Can't recognize response payload: ${issuesMessages}`,
+      message: `Can't recognize response payload: ${issuesMessages}. Original response: ${text}`,
     });
   }
 
