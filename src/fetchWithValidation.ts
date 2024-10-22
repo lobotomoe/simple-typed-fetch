@@ -41,7 +41,7 @@ export default async function fetchWithValidation<
       return err({
         type: "fetchError" as const,
         ...sharedData,
-        message: e.message,
+        message: `Fetch error: ${e.message}. URL: ${url}`,
         error: e,
       });
     }
@@ -49,7 +49,7 @@ export default async function fetchWithValidation<
     return err({
       type: "unknownFetchThrow" as const,
       ...sharedData,
-      message: "Unknown fetch error",
+      message: `Unknown fetch error. URL: ${url}`,
       error: e,
     });
   });
@@ -69,7 +69,7 @@ export default async function fetchWithValidation<
       return err({
         type: "unknownGetTextError" as const,
         ...sharedDataWithResponse,
-        message: `Can't get response content: ${e.message}`,
+        message: `Can't get response content: ${e.message}. URL: ${url}. HTTP ${response.status}`,
         error: e,
       });
     }
@@ -77,7 +77,7 @@ export default async function fetchWithValidation<
     return err({
       type: "unknownGetTextUnknownError" as const,
       ...sharedDataWithResponse,
-      message: "Can't get response content: unknown error",
+      message: `Can't get response content: Unknown error. URL: ${url}. HTTP ${response.status}`,
       error: e,
     });
   });
@@ -97,7 +97,7 @@ export default async function fetchWithValidation<
       return err({
         type: "jsonParseError" as const,
         ...sharedDataWithText,
-        message: e.message,
+        message: `Can't parse response as JSON: ${e.message}. URL: ${url}. HTTP ${response.status}. Original response: ${text}`,
         error: e,
       });
     }
@@ -105,7 +105,7 @@ export default async function fetchWithValidation<
     return err({
       type: "jsonParseUnknownError" as const,
       ...sharedDataWithText,
-      message: "Unknown JSON parse error",
+      message: `Unknown JSON parse error. URL: ${url}. HTTP ${response.status}. Original response: ${text}`,
       error: e,
     });
   });
@@ -125,7 +125,7 @@ export default async function fetchWithValidation<
     return err({
       type: "jsonParseError" as const,
       ...sharedDataWithText,
-      message: `Can't parse response as JSON: ${jsonResult.error.error.message}. Original response: ${text}`,
+      message: `Can't parse response as JSON: ${jsonResult.error.error.message}. URL: ${url}. HTTP ${response.status}. Original response: ${text}`,
       error: jsonResult.error.error,
     });
   }
@@ -156,7 +156,7 @@ export default async function fetchWithValidation<
     return err({
       type: "clientError" as const,
       ...sharedDataWithText,
-      message: `Error: ${response.status} ${response.statusText}. Original response: ${text}`,
+      message: `Error: ${response.status} ${response.statusText}. URL: ${url}. HTTP ${response.status}. Original response: ${text}`,
       errorMetadata,
     });
   }
@@ -170,7 +170,7 @@ export default async function fetchWithValidation<
     return err({
       type: "payloadParseError" as const,
       ...sharedDataWithText,
-      message: `Can't recognize response payload: ${issuesMessages}. Original response: ${text}`,
+      message: `Can't recognize response payload: ${issuesMessages}. URL: ${url}. HTTP ${response.status}. Original response: ${text}`,
     });
   }
 
