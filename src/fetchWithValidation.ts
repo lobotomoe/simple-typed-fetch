@@ -146,7 +146,9 @@ export default async function fetchWithValidation<
     return err({
       type: "serverError" as const,
       ...sharedDataWithText,
-      message: `Server error: ${response.status} ${response.statusText}. ${
+      message: `Server error. URL: ${url}. HTTP ${response.status} ${
+        response.statusText
+      }. Original response: ${text}. ${
         errorMetadata ? `Data: ${JSON.stringify(errorMetadata)}` : ""
       }`,
     });
