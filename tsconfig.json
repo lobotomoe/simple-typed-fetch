@@ -20,7 +20,8 @@
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "skipLibCheck": true,
-    "moduleResolution": "NodeNext"
+    "moduleResolution": "NodeNext",
+    "lib": ["es2022", "dom", "dom.iterable"]
   },
   "include": ["./src/**/*.ts"],
   "exclude": ["node_modules", "dist"]
