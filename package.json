@@ -4,7 +4,7 @@
     "type": "git",
     "url": "git+https://github.com/lobotomoe/simple-typed-fetch.git"
   },
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Making HTTP requests human way",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -37,6 +37,7 @@
   "dependencies": {
     "neverthrow": "^8.1.1",
     "patch-package": "^8.0.0",
+    "warp-isomorphic": "^1.0.7",
     "zod": "^3.23.8"
   },
   "homepage": "https://github.com/lobotomoe/simple-typed-fetch#readme",
