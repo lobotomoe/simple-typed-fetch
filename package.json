@@ -4,7 +4,7 @@
     "type": "git",
     "url": "git+https://github.com/lobotomoe/simple-typed-fetch.git"
   },
-  "version": "0.2.17",
+  "version": "0.3.0",
   "description": "Making HTTP requests human way",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -29,14 +29,12 @@
   },
   "keywords": [
     "fetch",
-    "unfetch",
     "zod",
     "typed"
   ],
   "author": "Alex Kraiz",
   "license": "ISC",
   "dependencies": {
-    "isomorphic-unfetch": "^4.0.2",
     "neverthrow": "^8.1.1",
     "patch-package": "^8.0.0",
     "zod": "^3.23.8"
@@ -46,6 +44,7 @@
     "dist/**/*"
   ],
   "devDependencies": {
+    "@types/node": "^22.10.1",
     "@typescript-eslint/eslint-plugin": ">=8.17.0",
     "@typescript-eslint/parser": ">=8.17.0",
     "eslint": ">=9.16.0",
@@ -54,10 +53,5 @@
     "rimraf": "^6.0.1",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2"
-  },
-  "pnpm": {
-    "patchedDependencies": {
-      "unfetch@5.0.0": "patches/unfetch@5.0.0.patch"
-    }
   }
 }
